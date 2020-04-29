@@ -252,7 +252,7 @@ export const ContentFormaPagamento = styled.div`
       
       .form-group > div{
           flex:50%;
-          overflow: hidden;
+          min-width: 155px;
       }
 
       .form-group-inp>div + div{
@@ -260,6 +260,7 @@ export const ContentFormaPagamento = styled.div`
       }
       .form-group-inp{
           margin-bottom:24px;
+          overflow: unset;
       }
 
 

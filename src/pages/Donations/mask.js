@@ -71,8 +71,6 @@ export const cpfMask = value => {
 
 
   export const valorMask = value => {  
-           
-
           var v = value.replace(/\D/g,'');
               v = (v/100).toFixed(2) + '';
               v = v.replace(".", ",");
@@ -83,3 +81,16 @@ export const cpfMask = value => {
          
       return v;
   }
+
+  
+  export const valorAmMask = value => {  
+              var v = value.replace(/\D/g,'');
+              v = (v/100).toFixed(2) + '';
+              v = v.replace(",", ".");
+              v = v.replace(/(\d)(\d{3})(\d{3}),/g, "$1.$2.$3,");
+              v = v.replace(/(\d)(\d{3}),/g, "$1.$2,");
+
+              console.log(v);
+
+          return v;
+}

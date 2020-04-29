@@ -13,7 +13,7 @@ import { Header,Button,Input,Loading,Switch } from "~/components";
 
 
 import * as Styled from "./styles.js";
-import { cpfMask,dataMask,cepMask,validadeMask,cardMask,phoneMask,valorMask,cnpjMask } from './mask';
+import { cpfMask,dataMask,cepMask,validadeMask,cardMask,phoneMask,valorMask,cnpjMask,valorAmMask,intMask} from './mask';
 import API  from "~/API"; 
 
 
@@ -24,7 +24,7 @@ export default function CheckoutCartao() {
 
     const inital = {           
       description:"", 
-      valor:"",
+      valor:"0",
       first_name:"",
       surname:"",
       cpf: "",
@@ -53,7 +53,6 @@ export default function CheckoutCartao() {
 
     const [loadingStatus, setloadingStatus] = useState(false);
      
-     
     const initialState = [false, false, false,false];
     const [activeClasses, setActiveClasses]                   = useState(initialState)
 
@@ -62,9 +61,10 @@ export default function CheckoutCartao() {
             const  active = [...initialState.slice(0, index), !initialState[index],initialState.slice(index + 1)].flat();
             setActiveClasses(active)
 
-             let arr=[5,50,500,""];
+             let arr=["5,00","50,00","500,00",""];           
+              
 
-            auxValues['valor'] =arr[index];
+             auxValues['valor'] =arr[index];
              
             setValues(auxValues)
     }
@@ -124,11 +124,13 @@ export default function CheckoutCartao() {
               auxValues[name] =cardMask(e.target.value)     
            else if(name=="phone")   
               auxValues[name] =phoneMask(e.target.value)                 
-           else if(name=="valor")   
+           else if(name=="valor" && activeClasses[3])   
               auxValues[name] =valorMask(e.target.value) 
            else if(name=="cnpj")   
               auxValues[name] =cnpjMask(e.target.value)                               
-           else
+           else if(name=="security_code")   
+              auxValues[name] =intMask(e.target.value)                               
+           else           
               auxValues[name] =e.target.value;
 
           
@@ -171,12 +173,12 @@ export default function CheckoutCartao() {
      
       for(var val in values){
           if(values[val]==''){ 
-                  //console.log(val);
-                let elem=document.getElementById(val);
-                    elem.style.display = "block"; 
+                  console.log(val);
+                  let elem=document.getElementById(val);
+                  elem.style.display = "block"; 
 
-                alert(elem.innerHTML);
-                return false;
+                   alert(elem.innerHTML);
+                  return false;
             }         
       }
 
@@ -212,20 +214,20 @@ export default function CheckoutCartao() {
           "id": id ? id : donation.id,
           "order": {
             "description":values.description,
-            "amount": values.valor,
+            "amount": valorAmMask(values.valor),
             "payment": {
               "card": {
                 "holder_name": values.holder_name,
-                "expiration_month": dataExpiration[0],
-                "expiration_year": dataExpiration[1],
-                "card_number": values.card_number,
-                "security_code": values.security_code	
+                "expiration_month":parseInt(dataExpiration[0]),
+                "expiration_year": parseInt(dataExpiration[1]),
+                "card_number": parseInt(values.card_number.replace(/\D/g, '')),
+                "security_code": parseInt(values.security_code)
               }	
             },
             "customer": {
               "first_name": values.first_name,
               "surname":   values.surname,
-              "cpf": values.cpf,
+              "cpf": values.cpf.replace(/\D/g, ''),
               "birthdate": values.birthdate,
               "email": values.email,
               "phone": values.phone,
@@ -250,6 +252,9 @@ export default function CheckoutCartao() {
         console.log(param);
 
        API.donations.CheckoutProjects(param).then(response =>{
+                 
+                 alert("Doação realizada com sucesso!");
+                 history.push("/donations");
                  setloadingStatus(false);
                  
        }).catch(errs=>{
